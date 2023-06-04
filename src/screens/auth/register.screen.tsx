@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import InputAuth from '../../components/auth/InputAuth';
-import BtnLogin from '../../components/auth/btnLogin';
 import BtnRegister from '../../components/auth/btnRegister';
+import axios from 'axios';
+// @ts-ignore
+import {API_URL} from '@env';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
@@ -17,9 +19,21 @@ const RegisterScreen = () => {
     } else if (password.length < 7) {
       setError('Mot de passe trop court');
     } else if (!emailRegex.test(email)) {
-      setError(('Email invalide'));
+      setError('Email invalide');
     } else {
       setError('');
+      axios
+        .post(`${API_URL}/auth/register`, {
+          email,
+          pseudo,
+          password,
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err.message);
+        });
     }
   };
   const handleSetPseudo = (text: string) => {
@@ -34,6 +48,7 @@ const RegisterScreen = () => {
   };
   return (
     <View style={styles.registerView}>
+      <Text>{API_URL}</Text>
       <View style={styles.header}>
         <Text style={styles.text}>Inscription</Text>
         <Text style={styles.textDesc}>
@@ -43,7 +58,11 @@ const RegisterScreen = () => {
       <View style={styles.inputRegister}>
         <InputAuth label={'Email'} value={email} setValue={handleSetEmail} />
         <InputAuth label={'Pseudo'} value={pseudo} setValue={handleSetPseudo} />
-        <InputAuth label={'Mot de passe'} value={password} setValue={handleSetPassword} />
+        <InputAuth
+          label={'Mot de passe'}
+          value={password}
+          setValue={handleSetPassword}
+        />
         {error.length > 0 && <Text style={styles.txtError}>{error}</Text>}
       </View>
 
